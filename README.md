@@ -21,7 +21,7 @@ Python 3, NumPy and PIL
 Run from the console like this, pointing to the target image as an argument. The image should be grayscale and 3<sup>n</sup> * 3<sup>n</sup> pixels large, where n is the number of iterations (stated in targetIteration, see below) the ruleset should be run to be compared to the target. E.g., the default value of 4 implies a target image 81 x 81 pixels large.
 
 ```
-$ python3 fractals.py --target lena.png
+$ python3 fractals.py --target pi.png
 ```
 
 ### Options (selection)
