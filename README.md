@@ -8,6 +8,12 @@ In their simplest forms, such rulesets have only two rules, but can have arbitra
 
 This algorithm was inspired and heavily influenced by [a post on Jack Hodkinson's blog](https://friendlyfieldsandopenmaps.com/2017/09/18/the-pi-fractal/) that explains the idea and general approach in far more detail. Thank you!
 
+### Example
+
+After breeding for 200 generations to match the letter Pi. Tint color applied to the result.
+
+<img src="https://github.com/thisancog/Genetic-Fractals/blob/master/example.png" width="162" height="162" />
+
 ### Requirements
 Python 3, NumPy and PIL
 
