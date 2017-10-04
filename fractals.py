@@ -6,31 +6,31 @@ from PIL.ImageChops import multiply
 from random import randint, choice
 
 # Options #
-numShades = 30						# number of shades / rules per ruleset (minimum: 2)
-populationSize = 2000				# number of rulesets to initially create
-generationSize = 200				# number of rulesets to create per generation
-targetConvergance = 100				# fitness per Pixel to reach to define a ruleset converged to the target
-									# -> real convergance = targetConvergance * 3 ** targetIteration
-maxGenerations = 50000				# maximum amount of generations to breed
-breedingSize = 20					# number of best adopted rulesets to breed with each other
-sparedIndividuals = 4				# number of top individuals to keep from the previous generation
-numNewIndividuals = 5				# number of completely random rulesets to add with each generation
+numShades = 30				# number of shades / rules per ruleset (minimum: 2)
+populationSize = 2000			# number of rulesets to initially create
+generationSize = 200			# number of rulesets to create per generation
+targetConvergance = 100			# fitness per Pixel to reach to define a ruleset converged to the target
+					# -> real convergance = targetConvergance * 3 ** targetIteration
+maxGenerations = 50000			# maximum amount of generations to breed
+breedingSize = 20			# number of best adopted rulesets to breed with each other
+sparedIndividuals = 4			# number of top individuals to keep from the previous generation
+numNewIndividuals = 5			# number of completely random rulesets to add with each generation
 defaultFitnessType = 'average'		# fitness measurement definition: 'average' or 'squaredDiff'
 
-targetIteration = 4					# which iteration the target image should be comapred to (resolution: 3^n x 3^n)
-startShade = 0						# the shade to start the first iteration with
-shadeSwapProb = 0.2					# probability to swap two shades in a rule
+targetIteration = 4			# which iteration the target image should be comapred to (resolution: 3^n x 3^n)
+startShade = 0				# the shade to start the first iteration with
+shadeSwapProb = 0.2			# probability to swap two shades in a rule
 genomePenetrationRatio = 0.5		# ratio of inherited genes from parent A to parent B
-mutationProb = 0.0001				# probability of a shade to randomly mutate
-allowCloning = False				# states if a rule can be copied/cloned if there are always have to be two parent rules
-discardClones = False				# states if identical individuals in the breeding pool should be discarded
+mutationProb = 0.0001			# probability of a shade to randomly mutate
+allowCloning = False			# states if a rule can be copied/cloned if there are always have to be two parent rules
+discardClones = False			# states if identical individuals in the breeding pool should be discarded
 
-saveFolder = 'results'				# name of the folder to store results
-progressFrequency = 1				# the number of generations to pass before saving a progress picture
-autosaveFrequency = 100				# the number of generations to pass before autosaving the rulesets
-tintColor = False					# the color all shades should be tinted in, tuple of rgb values [0-255],
-									# False for no shading
-									# before: (143, 201, 255)
+saveFolder = 'results'			# name of the folder to store results
+progressFrequency = 1			# the number of generations to pass before saving a progress picture
+autosaveFrequency = 100			# the number of generations to pass before autosaving the rulesets
+tintColor = False			# the color all shades should be tinted in, tuple of rgb values [0-255],
+					# False for no shading
+					# before: (143, 201, 255)
 
 # Global variables #
 rulesets = []
@@ -242,7 +242,8 @@ def store_rulesets():
 def new_generation():
 	global rulesets
 
-	newGeneration = []
+	rulesets = rulesets[:breedingSize]
+	newGeneration = rulesets
 
 	# get rid of clones
 	if discardClones:
@@ -252,8 +253,6 @@ def new_generation():
 		while (len(newGeneration) < breedingSize and i < len(rulesets)):
 			if (rulesets[i] != newGeneration[i - 1]):
 				newGeneration.append(rulesets[i])
-	else:
-		newGeneration = rulesets[:breedingSize]
 		
 	# keep best individuals from previous generation
 	newGeneration = newGeneration[:sparedIndividuals]
@@ -355,6 +354,7 @@ def main():
 		try:
 			breed_generation()
 		except (KeyboardInterrupt, SystemExit):
+			store_rulesets()
 			report_results()
 			raise
 		except:
