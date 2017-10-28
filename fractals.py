@@ -5,6 +5,9 @@ from PIL import Image, ImageDraw
 from PIL.ImageChops import multiply
 from random import randint, choice
 
+# Profiling
+import time
+
 # Options #
 numShades = 30				# number of shades / rules per ruleset (minimum: 2)
 populationSize = 2000			# number of rulesets to initially create
@@ -24,6 +27,7 @@ genomePenetrationRatio = 0.5		# ratio of inherited genes from parent A to parent
 mutationProb = 0.0001			# probability of a shade to randomly mutate
 allowCloning = False			# states if a rule can be copied/cloned if there are always have to be two parent rules
 discardClones = False			# states if identical individuals in the breeding pool should be discarded
+timeIt = False
 
 saveFolder = 'results'			# name of the folder to store results
 progressFrequency = 1			# the number of generations to pass before saving a progress picture
@@ -125,7 +129,32 @@ def breed_rulesets(ruleseta, rulesetb):
 
 
 # Iterate a rule n times
+def iterate_ruleset_new(ruleset, iteration = targetIteration):
+	dimension = 3 ** iteration
+	result = np.empty([dimension, dimension])
+	rules = ruleset['rules']
+
+	for y in range(dimension):
+		for x in range(dimension):
+			color = startShade * math.floor(255 / (numShades - 1))
+			px = x
+			py = y
+			div = dimension / 3
+
+			while (div > 0):
+				index = int(py // div * 3 + px // div)
+				color = rules[color][index]
+				px %= div
+				py %= div
+				div /= 3
+
+			result[x][y] = color
+
+	return result
+
+# Iterate a rule n times
 def iterate_ruleset(ruleset, iteration = targetIteration):
+	start = time.clock()
 	dimension = 3 ** iteration
 	initial = startShade * math.floor(255 / (numShades - 1))
 	result = Image.new('L', (dimension, dimension), initial)
@@ -153,12 +182,15 @@ def iterate_ruleset(ruleset, iteration = targetIteration):
 
 
 def measure_fitness():
-	if (defaultFitnessType == 'average'):
-		for ruleset in rulesets:
-			ruleset['fitness'] = get_fitness_average(ruleset)
-	elif (defaultFitnessType == 'squaredDiff'):
-		for ruleset in rulesets:
-			ruleset['fitness'] = get_fitness_squaredDiff(ruleset)
+	if timeIt:
+		start = time.clock()
+
+	for ruleset in rulesets:
+		get_fitness(ruleset)
+
+	if timeIt:
+		end = time.clock()
+		print('Fitness measured. Time elapsed: ', (end - start))
 
 
 # Compare iteration of a rule with the target
@@ -181,6 +213,7 @@ def get_fitness_squaredDiff(ruleset):
 def get_fitness_average(ruleset):
 	iteration = conv_iteration(iterate_ruleset(ruleset))
 	return np.sum(np.square(targetConv - iteration))
+
 
 
 def conv_iteration(iteration):
@@ -310,7 +343,7 @@ def construct_animation():
 	return
 
 
-# log reuslts to the console
+# log results to the console
 def report_results():
 	stopTime = datetime.datetime.now()
 	delta = stopTime - startTime
