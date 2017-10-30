@@ -15,7 +15,7 @@ generationSize = 200			# number of rulesets to create per generation
 targetConvergance = 100			# fitness per Pixel to reach to define a ruleset converged to the target
 					# -> real convergance = targetConvergance * 3 ** targetIteration
 maxGenerations = 50000			# maximum amount of generations to breed
-breedingSize = 20			# number of best adopted rulesets to breed with each other
+breedingSize = 10			# number of best adopted rulesets to breed with each other
 sparedIndividuals = 4			# number of top individuals to keep from the previous generation
 numNewIndividuals = 5			# number of completely random rulesets to add with each generation
 defaultFitnessType = 'average'		# fitness measurement definition: 'average' or 'squaredDiff'
@@ -275,8 +275,9 @@ def store_rulesets():
 def new_generation():
 	global rulesets
 
-	rulesets = rulesets[:breedingSize]
-	newGeneration = rulesets
+	if len(rulesets) > breedingSize:
+		rulesets = rulesets[:breedingSize]
+	newGeneration = []
 
 	# get rid of clones
 	if discardClones:
@@ -288,7 +289,7 @@ def new_generation():
 				newGeneration.append(rulesets[i])
 		
 	# keep best individuals from previous generation
-	newGeneration = newGeneration[:sparedIndividuals]
+	# newGeneration = newGeneration[:sparedIndividuals]
 
 	# add random new individuals
 	randomNewIndividuals = []
